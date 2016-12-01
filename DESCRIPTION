@@ -1,9 +1,11 @@
 Package: gthor
 Type: Package
-Title: What the Package Does (Title Case)
+Title: R package of things I find useful in my PhD work (Title Case)
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: Geoffrey Thomson
+Maintainer: Geoffrey Thomson <gtho123@aucklanduni.ac.nz>
+Description: Mostly useful for flowering time and qRT-PCR data
+License: MIT License
 LazyData: TRUE
+URL:https://github.com/G-Thomson/gthor
+BugReports: https://github.com/G-Thomson/gthor/issues
