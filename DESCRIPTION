@@ -7,5 +7,6 @@ Maintainer: Geoffrey Thomson <gtho123@aucklanduni.ac.nz>
 Description: Mostly useful for flowering time and qRT-PCR data
 License: MIT License
 LazyData: TRUE
-URL:https://github.com/G-Thomson/gthor
+URL: https://github.com/G-Thomson/gthor
 BugReports: https://github.com/G-Thomson/gthor/issues
+RoxygenNote: 5.0.1
