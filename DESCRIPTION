@@ -1,6 +1,6 @@
 Package: gthor
 Type: Package
-Title: R package of things I find useful in my PhD work (Title Case)
+Title: R package of things I find useful in my PhD work
 Version: 0.1.0
 Author: Geoffrey Thomson
 Maintainer: Geoffrey Thomson <gtho123@aucklanduni.ac.nz>
