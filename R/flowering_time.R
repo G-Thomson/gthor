@@ -56,7 +56,8 @@ flr.summary <- function(data, LoI){
 #'
 #' @param data This is a dataframe from flr.summary
 #' 
-#' @return This function plots flowering time data
+#' @return This function plots flowering time data. If you a just comparing one line and its wild-type control it 
+#'  will colour and plot these side by side. If there are multiple conditions then it will colour these and facet by genotype.
 #' @examples flr.plot(data)
 #' @export
 flr.plot <- function(data){
@@ -64,45 +65,80 @@ flr.plot <- function(data){
   require(tidyverse)
   require(cowplot)
   require(ggthemes)
-
-  Flr <- ggplot(data[["Summary"]], aes(x = SN, y = Days_to_flower_mean, fill = SN)) +
-          geom_bar(stat = "identity") +
-          geom_errorbar(aes(ymin=Days_to_flower_mean-Day_se, 
-                            ymax=Days_to_flower_mean+Day_se), width=.2) +
-          geom_point(data = data[["Raw"]], aes(x = SN, y = Days_to_flower)) +
-          theme_wsj() +
-          theme(legend.position="none", 
-           plot.background = element_rect(fill = "transparent",colour = NA),
-           panel.background = element_rect(fill = "transparent",colour = NA),
-           axis.ticks.length= unit(0.5,"cm"),
-           axis.text = element_text(size = 28),
-           axis.title = element_blank(), 
-           axis.title.x = element_text(vjust = 4), 
-           axis.title.y = element_text(angle = 90, vjust = 12))+
-          scale_fill_manual(values = g_colours) +
-          ggtitle("Days to Flower")
   
-  Node <- ggplot(data[["Summary"]], aes(x = SN, y = Node_num_mean, fill = SN)) +
-    geom_bar(stat = "identity") +
-    geom_errorbar(aes(ymin=Node_num_mean-Day_se, 
-                      ymax=Node_num_mean+Day_se), width=.2) +
-    geom_point(data = data[["Raw"]], aes(x = SN, y = Node_num))+
+  # Number of unique conditions
+  cond_cnt <- data[["Summary"]] %>% 
+    select_("Conditions") %>% 
+    unique(.) %>% 
+    length(.)
+  
+  # Plot y axis limits
+  flr_ax_lim = data[["Raw"]]  %>% 
+    select_("Days_to_flower")  %>% 
+    max() %>% 
+    plyr::round_any(10, ceiling)
+  node_ax_lim = data[["Raw"]]  %>% 
+    select_("Node_num")  %>% 
+    max() %>% 
+    plyr::round_any(5, ceiling)
+  
+  if(cond_cnt == 1){
+    x = "Genotype"
+    Colour = "Genotype"
+  }
+  else{
+    x = "Conditions"
+    Colour = "Conditions"
+    # facet
+  }
+
+  Flr <-  ggplot(data[["Summary"]], aes_string(x = x, y = "Days_to_flower_mean", fill = Colour)) +
+            geom_point(data = data[["Raw"]], aes_string(x = x, y = "Days_to_flower")) +
+            geom_bar(data = data[["Summary"]], stat = "identity") +
+            geom_errorbar(aes(ymin=Days_to_flower_mean-Day_se,
+                              ymax=Days_to_flower_mean+Day_se), width=.2)  +
+            theme_wsj() +
+            theme(legend.position="none", 
+                  plot.background = element_rect(fill = "transparent",colour = NA),
+                  panel.background = element_rect(fill = "transparent",colour = NA),
+                  strip.background = element_rect(fill = "transparent",colour = NA),
+                  axis.text = element_text(size = 14),
+                  axis.title = element_text(),
+                  axis.title.x = element_text(vjust = -2),
+                  axis.title.y = element_text(vjust = 4)) +
+            scale_fill_manual(values = g_colours) +
+            labs(y = "Mean days to flower") +
+            scale_y_continuous(expand=c(0,0), limits = c(0, flr_ax_lim)) +
+            ggtitle("Days to Flower")
+  
+  Node <- ggplot(data[["Summary"]], aes_string(x = x, y = "Node_num_mean", fill = Colour)) +
+    geom_point(data = data[["Raw"]], aes_string(x = x, y = "Node_num")) +
+    geom_bar(data = data[["Summary"]], stat = "identity") +
+    geom_errorbar(aes(ymin=Node_num_mean - Node_se,
+                      ymax=Node_num_mean + Node_se), width=.2)  +
     theme_wsj() +
     theme(legend.position="none", 
           plot.background = element_rect(fill = "transparent",colour = NA),
           panel.background = element_rect(fill = "transparent",colour = NA),
-          axis.ticks.length= unit(0.5,"cm"),
-          axis.text = element_text(size = 28),
-          axis.title = element_blank(), 
-          axis.title.x = element_text(vjust = 4), 
-          axis.title.y = element_text(angle = 90, vjust = 12))+
+          strip.background = element_rect(fill = "transparent",colour = NA),
+          axis.text = element_text(size = 14),
+          axis.title = element_text(),
+          axis.title.x = element_text(vjust = -2),
+          axis.title.y = element_text(vjust = 4)) +
     scale_fill_manual(values = g_colours) +
+    labs(y = "Mean nodes at time of flowering") +
+    scale_y_continuous(expand=c(0,0), limits = c(0, node_ax_lim)) +
     ggtitle("Nodes at Flowering")
   
-
+  if(cond_cnt > 1){
+    Flr <- Flr + facet_grid(.~Genotype, scales="free") 
+    Node <- Node + facet_grid(.~Genotype, scales="free") 
+  }
+  else{}
+  
   plot_grid(Flr, Node)
+  
 }
-
 
 #' flr.hist.graph 
 #' 
