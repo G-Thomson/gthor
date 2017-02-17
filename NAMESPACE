@@ -3,7 +3,6 @@
 export(eds.summary)
 export(eds.test)
 export(flr.hist)
-export(flr.hist.graph)
 export(flr.plot)
 export(flr.summary)
 export(ggplotRegression)
