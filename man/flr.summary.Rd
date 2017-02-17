@@ -8,14 +8,14 @@ flr.summary(data, LoI)
 }
 \arguments{
 \item{data}{This is a dataframe of flowering time fata with the following columns; Sowing.Number,
-Conditions, Genotype, Plant.Number, Date.Sown, Date.Flowered, Number.of.Days.to.First.Floral.Bud, 
+Conditions, Genotype, Plant.Number, Date.Sown, Date.Flowered, Number.of.Days.to.First.Floral.Bud,
 Position.of.1st.Floral.Bud, Node.Number.of.Main.Axis.at.1st.Floral.Bud and Comments.}
 
 \item{LoI}{These are the Lines of Interest to be examined. Enter these as a vector of sowing
 numbers as characters.}
 }
 \value{
-This function summarises a flowering time data frame producing a list of the 
+This function summarises a flowering time data frame producing a list of the
 summarised data and relevant raw data
 }
 \description{

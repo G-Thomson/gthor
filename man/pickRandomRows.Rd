@@ -10,7 +10,7 @@ pickRandomRows(df, numberOfRows = 10)
 \item{df}{A dataframe}
 
 \item{numberOfRows}{Number of rows to sample
-  
+
 This function randomly selects rows from a data frame. I got it from here/; http://www.markhneedham.com/blog/2014/11/26/r-dplyr-select-random-rows-from-a-data-frame/}
 }
 \description{

@@ -10,7 +10,8 @@ flr.plot(data)
 \item{data}{This is a dataframe from flr.summary}
 }
 \value{
-This function plots flowering time data
+This function plots flowering time data. If you a just comparing one line and its wild-type control it
+ will colour and plot these side by side. If there are multiple conditions then it will colour these and facet by genotype.
 }
 \description{
 flr.plot
