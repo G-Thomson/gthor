@@ -220,7 +220,7 @@ sds.test <- function(data, Reference_gene, Measured_genes, Experimental_conditio
 #' @examples read.eds(Path)
 #' @examples read.eds(Path, in_file == "Melt")
 #' @export
-read.eds <- function(path, in_file = "Results"){
+read.eds <- function(Path, in_file = "Results"){
 
   require(dplyr)
 
