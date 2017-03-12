@@ -156,6 +156,8 @@ flr.hist.graph <- function(data, meas = "fl", new.titles = NULL){
   require(scales)
   require(ggthemes)
 
+  data <- data$Raw
+
   # Creates the basic plots based on measurment of flowering
   if(meas == "nd"){
     plot <- ggplot(data=data, aes(Node_num, fill = Mutant)) +
