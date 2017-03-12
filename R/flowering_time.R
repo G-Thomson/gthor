@@ -158,18 +158,18 @@ flr.hist.graph <- function(data, meas = "fl", new.titles = NULL){
 
   # This takes the raw data from the flr.summary object and adds a colour column
   dat <- data$Raw %>% mutate(colr = ifelse(Genotype == "R108", "#00A08A",
-                                        ifelse(Mutant == "Homo", "#F2AD00", "#FF0000")))
+                                           ifelse(Mutant == "Homo", "#F2AD00", "#FF0000")))
 
   # Creates the basic plots based on measurment of flowering
   if(meas == "nd"){
     plot <- ggplot(data=dat, aes(Node_num, fill = Mutant)) +
-      geom_histogram(data=subset(dat, Genotype!="R108"),aes(y=..count.., fill = colr), position='dodge', binwidth = 0.5) +
-      geom_histogram(data=subset(dat, Genotype=="R108"),aes(x = Node_num, y=..count.., fill = colr), position=position_nudge(x=0.15), binwidth = 0.25)
+      geom_histogram(data=subset(dat, Genotype!="R108"),aes(y=..count..), binwidth = 1.5) +
+      geom_histogram(data=subset(dat, Genotype=="R108"),aes(x = Node_num, y=..count..), binwidth = 1.5)
   }
   else if(meas == "fl"){
     plot <- ggplot(data=dat, aes(Days_to_flower, fill = Mutant)) +
-      geom_histogram(data=subset(dat, Genotype!="R108"),aes(y=..count.., fill = colr), position='dodge', binwidth = 1) +
-      geom_histogram(data=subset(dat, Genotype=="R108"),aes(x = Days_to_flower, y=..count.., fill = colr), position=position_nudge(x=0.25), binwidth = 0.5)
+      geom_histogram(data=subset(dat, Genotype!="R108"),aes(y=..count.., fill = colr), binwidth = 1.5) +
+      geom_histogram(data=subset(dat, Genotype=="R108"),aes(x = Days_to_flower, y=..count.., fill = colr), binwidth = 1.5)
   }
   else{ stop("ERROR: Please specify a correct measurment of flowering. See docs for details.") }
 
@@ -184,7 +184,7 @@ flr.hist.graph <- function(data, meas = "fl", new.titles = NULL){
           axis.title.y = element_text(angle = 90),
           axis.text.x = element_text(size = 14, angle = 45, hjust = 1),
           axis.text.y = element_text(size = 14),
-          panel.margin = unit(3, "lines"),
+          # panel.margin = unit(3, "lines"),
           strip.background = element_blank(),
           strip.text = element_text(hjust=0, size = 16)) +
     scale_y_continuous(expand=c(0,0), breaks=pretty_breaks())
