@@ -180,14 +180,15 @@ flr.hist.graph <- function(data, meas = "fl", new.titles = NULL){
     theme(legend.position="none",
           plot.background = element_rect(fill = "transparent",colour = NA),
           panel.background = element_rect(fill = "transparent",colour = NA),
-          axis.title = element_text(size = 20),
+          axis.title = element_text(size = 14),
           axis.title.y = element_text(angle = 90),
           axis.text.x = element_text(size = 14, angle = 45, hjust = 1),
           axis.text.y = element_text(size = 14),
           # panel.margin = unit(3, "lines"),
           strip.background = element_blank(),
           strip.text = element_text(hjust=0, size = 16)) +
-    scale_y_continuous(expand=c(0,0), breaks=pretty_breaks())
+    scale_y_continuous(expand=c(0,0))
+    # scale_y_continuous(expand=c(0,0), breaks=pretty_breaks())
 
   # Flowering or node specific graph elements - axis titles, facet titles
   if(meas == "nd"){
