@@ -158,14 +158,14 @@ flr.hist.graph <- function(data, meas = "fl", new.titles = NULL){
 
   # Creates the basic plots based on measurment of flowering
   if(meas == "nd"){
-    plot <- ggplot(data=dat, aes(Node_num, fill = Mutant)) +
-      geom_histogram(data=subset(dat, Genotype!="R108"),aes(y=..count..), binwidth = 1) +
-      geom_histogram(data=subset(dat, Genotype=="R108"),aes(x = Node_num, y=..count..), binwidth = 1)
+    plot <- ggplot(data=data, aes(Node_num, fill = Mutant)) +
+      geom_histogram(data=subset(data, Genotype!="R108"),aes(y=..count..), binwidth = 1) +
+      geom_histogram(data=subset(data, Genotype=="R108"),aes(x = Node_num, y=..count..), binwidth = 1)
   }
   else if(meas == "fl"){
-    plot <- ggplot(data=dat, aes(Days_to_flower, fill = Mutant)) +
-      geom_histogram(data=subset(dat, Genotype!="R108"),aes(y=..count.., fill = colr), binwidth = 1) +
-      geom_histogram(data=subset(dat, Genotype=="R108"),aes(x = Days_to_flower, y=..count.., fill = colr), binwidth = 1)
+    plot <- ggplot(data=data, aes(Days_to_flower, fill = Mutant)) +
+      geom_histogram(data=subset(data, Genotype!="R108"),aes(y=..count.., fill = colr), binwidth = 1) +
+      geom_histogram(data=subset(data, Genotype=="R108"),aes(x = Days_to_flower, y=..count.., fill = colr), binwidth = 1)
   }
   else{ stop("ERROR: Please specify a correct measurment of flowering. See docs for details.") }
 
