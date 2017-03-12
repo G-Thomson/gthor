@@ -156,27 +156,23 @@ flr.hist.graph <- function(data, meas = "fl", new.titles = NULL){
   require(scales)
   require(ggthemes)
 
-  # This takes the raw data from the flr.summary object and adds a colour column
-  dat <- data$Raw %>% mutate(colr = ifelse(Genotype == "R108", "#00A08A",
-                                           ifelse(Mutant == "Homo", "#F2AD00", "#FF0000")))
-
   # Creates the basic plots based on measurment of flowering
   if(meas == "nd"){
     plot <- ggplot(data=dat, aes(Node_num, fill = Mutant)) +
-      geom_histogram(data=subset(dat, Genotype!="R108"),aes(y=..count..), binwidth = 1.5) +
-      geom_histogram(data=subset(dat, Genotype=="R108"),aes(x = Node_num, y=..count..), binwidth = 1.5)
+      geom_histogram(data=subset(dat, Genotype!="R108"),aes(y=..count..), binwidth = 1) +
+      geom_histogram(data=subset(dat, Genotype=="R108"),aes(x = Node_num, y=..count..), binwidth = 1)
   }
   else if(meas == "fl"){
     plot <- ggplot(data=dat, aes(Days_to_flower, fill = Mutant)) +
-      geom_histogram(data=subset(dat, Genotype!="R108"),aes(y=..count.., fill = colr), binwidth = 1.5) +
-      geom_histogram(data=subset(dat, Genotype=="R108"),aes(x = Days_to_flower, y=..count.., fill = colr), binwidth = 1.5)
+      geom_histogram(data=subset(dat, Genotype!="R108"),aes(y=..count.., fill = colr), binwidth = 1) +
+      geom_histogram(data=subset(dat, Genotype=="R108"),aes(x = Days_to_flower, y=..count.., fill = colr), binwidth = 1)
   }
   else{ stop("ERROR: Please specify a correct measurment of flowering. See docs for details.") }
 
   # Generic plot aesthetics
   plot <- plot +
-    scale_fill_manual(values = g_colours[c(2,3,1)]) +
-    theme_wsj() +
+    scale_fill_manual(values = g_colours[c(3,2)]) +
+    ggthemes::theme_wsj() +
     theme(legend.position="none",
           plot.background = element_rect(fill = "transparent",colour = NA),
           panel.background = element_rect(fill = "transparent",colour = NA),
@@ -186,7 +182,7 @@ flr.hist.graph <- function(data, meas = "fl", new.titles = NULL){
           axis.text.y = element_text(size = 14),
           strip.background = element_blank(),
           strip.text = element_text(hjust=0, size = 16)) +
-    scale_y_continuous(expand=c(0,0), breaks=pretty_breaks())
+    scale_y_continuous(expand=c(0,0), breaks=scales::pretty_breaks())
 
   # Flowering or node specific graph elements - axis titles, facet titles
   if(meas == "nd"){
