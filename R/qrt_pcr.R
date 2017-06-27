@@ -345,7 +345,7 @@ eds.test <- function(data, Reference_gene, Measured_genes, Experimental_conditio
 
   # Analyse one gene at a time
   for(g in 1:length(Measured_genes)){
-
+    
     # This is where all the gene's data will go
     gene.data <- data.frame()
 
@@ -366,6 +366,10 @@ eds.test <- function(data, Reference_gene, Measured_genes, Experimental_conditio
       rel.data <- grep(Measured_genes[g], data.names, value=TRUE)
       gene.data <- bind_rows(gene.data, inner_join(data[[rel.ref]], data[[rel.data]], by = "Sample"))
     }
+    
+#     return(Measured_genes[g])}
+# }
+# eds.test(data_res_New_FTa1, "MtPDF2", "New_FTa1", Replicate_id = "_B")
 
     # Once a genes data for all conditions (if required) is collected do the analysis, this allows relative expression to be observed
     # over multiple conditions
@@ -376,7 +380,7 @@ eds.test <- function(data, Reference_gene, Measured_genes, Experimental_conditio
       separate(Sample, c("Sample", "Bio_Rep"), Replicate_id) %>%
       select(Sample, comp_exp) %>%
       group_by(Sample) %>%
-      summarise_each(funs(mean = mean(., na.rm = TRUE), sd = sd, len = length)) %>%
+      summarise_each(funs(mean = mean(., na.rm = TRUE), sd = sd(., na.rm = TRUE), len = length)) %>%
       mutate(se = sd/sqrt(len)) %>%
       select(Sample, mean, sd, se)
 

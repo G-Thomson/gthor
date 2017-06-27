@@ -93,8 +93,8 @@ flr.plot <- function(data){
   }
 
   Flr <-  ggplot(data[["Summary"]], aes_string(x = x, y = "Days_to_flower_mean", fill = Colour)) +
-            geom_point(data = data[["Raw"]], aes_string(x = x, y = "Days_to_flower")) +
             geom_bar(data = data[["Summary"]], stat = "identity") +
+            geom_point(data = data[["Raw"]], aes_string(x = x, y = "Days_to_flower")) +
             geom_errorbar(aes(ymin=Days_to_flower_mean-Day_se,
                               ymax=Days_to_flower_mean+Day_se), width=.2)  +
             theme_wsj() +
@@ -112,8 +112,8 @@ flr.plot <- function(data){
             ggtitle("Days to Flower")
 
   Node <- ggplot(data[["Summary"]], aes_string(x = x, y = "Node_num_mean", fill = Colour)) +
-    geom_point(data = data[["Raw"]], aes_string(x = x, y = "Node_num")) +
     geom_bar(data = data[["Summary"]], stat = "identity") +
+    geom_point(data = data[["Raw"]], aes_string(x = x, y = "Node_num")) +
     geom_errorbar(aes(ymin=Node_num_mean - Node_se,
                       ymax=Node_num_mean + Node_se), width=.2)  +
     theme_wsj() +
@@ -185,7 +185,8 @@ flr.hist.graph <- function(data, meas = "fl", new.titles = NULL){
           axis.text.y = element_text(size = 14),
           strip.background = element_blank(),
           strip.text = element_text(hjust=0, size = 16)) +
-    scale_y_continuous(expand=c(0,0), breaks=scales::pretty_breaks())
+    scale_y_continuous(expand=c(0,0), breaks=scales::pretty_breaks()) +
+    scale_x_continuous(breaks=scales::pretty_breaks())
 
   # Flowering or node specific graph elements - axis titles, facet titles
   if(meas == "nd"){
