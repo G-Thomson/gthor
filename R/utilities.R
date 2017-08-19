@@ -37,16 +37,18 @@ pickRandomRows = function(df, numberOfRows = 10) {
 #' @examples Path = "~/Documents/Nanophotometer/21_7_16_.xlsx"
 #' read_nano(Path, 7)
 #' @export
-read.nano <- function(Path, n_samples){
+read.nano <- function(Path){
 
   require(readxl)
+  require(dplyr)
+  require(magrittr)
   require(knitr)
 
-  data <- read_excel(Path, skip = 14)
-  data <- data[c(2:(n_samples+1)), c(2,3,11,12)]
-  colnames(data) <- c("Sample", "Concentration", "A260/A280", "A260/A230")
+  dat <- read_excel(Path, skip = 20)
+  dat <- dplyr::select(dat, 2,3,11,12)
+  dat <- magrittr::set_colnames(dat, c("Sample", "Concentration", "A260/A280", "A260/A230"))
 
-  kable(data, format = "markdown", row.names = FALSE)
+  kable(dat, format = "markdown", row.names = FALSE,  padding = 2, align = 'c')
 }
 
 
