@@ -9,4 +9,10 @@ License: MIT License
 LazyData: TRUE
 URL: https://github.com/G-Thomson/gthor
 BugReports: https://github.com/G-Thomson/gthor/issues
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
+Imports:
+  tidyverse,
+  readr
+Depends:
+  tidyverse,
+  readr

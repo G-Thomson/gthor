@@ -26,4 +26,3 @@ data = Mid_2016
 LoI = c("P912", "P913") # Lines of interest
 d <- flr.summary(data, LoI)
 }
-

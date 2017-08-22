@@ -31,4 +31,3 @@ Experimental_conditions <- c("SD", "LD")
 Problems <- c("A14", "B1", "B12", "I4", "I5", "I6", "J1")
 sds.summary(test, Experimental_conditions = Experimental_conditions, Problems = Problems)
 }
-

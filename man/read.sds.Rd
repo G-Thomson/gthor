@@ -24,4 +24,3 @@ read.sds
 \examples{
 read.sds(Path)
 }
-

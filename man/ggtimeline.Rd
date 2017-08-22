@@ -25,4 +25,3 @@ ggtimeline
 \examples{
 timeline(timeline_dates, "1/1/2015", "1/3/2018")
 }
-

@@ -20,4 +20,3 @@ pal
 \examples{
 pal(g_colours)
 }
-

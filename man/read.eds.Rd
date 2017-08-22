@@ -4,13 +4,13 @@
 \alias{read.eds}
 \title{read.eds}
 \usage{
-read.eds(path, in_file = "Results")
+read.eds(Path, in_file = "Results")
 }
 \arguments{
-\item{path}{This is a character string to point you to the file}
-
 \item{in_file}{This is the type of input file. By default it is "Results" for Ct results
 but you can also set it to "Melt" for melting curve data.}
+
+\item{path}{This is a character string to point you to the file}
 }
 \value{
 This function imports csv files from a eds file produced by the Quant 5
@@ -22,5 +22,5 @@ read.eds
 }
 \examples{
 read.eds(Path)
+read.eds(Path, in_file == "Melt")
 }
-

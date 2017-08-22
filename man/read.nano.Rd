@@ -4,7 +4,7 @@
 \alias{read.nano}
 \title{read.nano}
 \usage{
-read.nano(Path, n_samples)
+read.nano(Path)
 }
 \arguments{
 \item{Path}{The path to the Nanophotometer output file}
@@ -20,4 +20,3 @@ read.nano
 Path = "~/Documents/Nanophotometer/21_7_16_.xlsx"
 read_nano(Path, 7)
 }
-

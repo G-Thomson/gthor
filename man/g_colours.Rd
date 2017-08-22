@@ -16,4 +16,3 @@ g_colours
 These are the colours I use in my plots.
 }
 \keyword{datasets}
-

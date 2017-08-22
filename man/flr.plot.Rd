@@ -19,4 +19,3 @@ flr.plot
 \examples{
 flr.plot(data)
 }
-

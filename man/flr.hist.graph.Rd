@@ -21,5 +21,5 @@ flr.hist.graph
 }
 \examples{
 new_labs <- c(`NF5076` = "NF5076 - LD+V", `R108` = "R108 - LD+V")
+flr.hist.graph(res, new.titles = new_labs)
 }
-

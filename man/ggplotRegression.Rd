@@ -16,4 +16,3 @@ Johnston (https://susanejohnston.wordpress.com/2012/08/09/a-quick-and-easy-funct
 \description{
 ggplotRegression
 }
-
