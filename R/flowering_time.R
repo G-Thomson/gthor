@@ -1,14 +1,14 @@
 #' flr.summary
 #'
 #' @param data This is a dataframe of flowering time fata with the following columns; Sowing.Number,
-#'  Conditions, Genotype, Individual, Plant.Number, Date.Sown, Date.Flowered,
+#'  Conditions, Genotype (of parent seed), Individual, Plant.Number, Date.Sown, Date.Flowered,
 #'  Number.of.Days.to.First.Floral.Bud, Position.of.1st.Floral.Bud,
 #'  Node.Number.of.Main.Axis.at.1st.Floral.Bud, Comments and Mutant.
 #'
 #' @param LoI These are the Lines of Interest to be examined. Enter these as a vector of sowing
 #'  numbers as characters.
-#' @param group Data can be grouped either by by sowing number (sowing_number) or growth conditions
-#' (conditions). Only these options are possible. When data is grouped by conditions the sowing
+#' @param group Data can be grouped either by by sowing number (sowing_number), growth conditions
+#' (conditions) or mutantion genotype (mutant). Only these options are possible. When data is grouped by conditions the sowing
 #' numbers column is a list in case multiple sowing numbers are included.
 #'
 #' @return This function summarises a flowering time data frame producing a dataframe of the
@@ -30,7 +30,7 @@ flr.summary <- function(data, LoI, group = sowing_number){
   group <- enquo(group)
 
   # This just checks that the grouping argument is valid
-  if(!quo_name(group) %in% c("sowing_number", "conditions")) stop("You can only group by sowing_number or conditions")
+  if(!quo_name(group) %in% c("sowing_number", "conditions", "mutant")) stop("You can only group by sowing_number or conditions")
 
   # Rename data
   data <- rename(data,
@@ -71,6 +71,12 @@ flr.summary <- function(data, LoI, group = sowing_number){
     rel.sum <- rel.sum %>%
       group_by(!!group, genotype) %>%
       nest(sowing_number, days_to_flower, node_num, mutant) %>%
+      mutate(sowing_numbers = map(data, ~ unique(.x$sowing_number)))
+  }
+  else if(quo_name(group) == "mutant"){
+    rel.sum <- rel.sum %>%
+      group_by(!!group, conditions, genotype) %>%
+      nest(sowing_number, days_to_flower, node_num) %>%
       mutate(sowing_numbers = map(data, ~ unique(.x$sowing_number)))
   }
 
