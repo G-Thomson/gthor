@@ -4,25 +4,33 @@
 \alias{flr.summary}
 \title{flr.summary}
 \usage{
-flr.summary(data, LoI)
+flr.summary(data, LoI, group = sowing_number)
 }
 \arguments{
 \item{data}{This is a dataframe of flowering time fata with the following columns; Sowing.Number,
-Conditions, Genotype, Plant.Number, Date.Sown, Date.Flowered, Number.of.Days.to.First.Floral.Bud,
-Position.of.1st.Floral.Bud, Node.Number.of.Main.Axis.at.1st.Floral.Bud and Comments.}
+Conditions, Genotype, Individual, Plant.Number, Date.Sown, Date.Flowered,
+Number.of.Days.to.First.Floral.Bud, Position.of.1st.Floral.Bud,
+Node.Number.of.Main.Axis.at.1st.Floral.Bud, Comments and Mutant.}
 
 \item{LoI}{These are the Lines of Interest to be examined. Enter these as a vector of sowing
 numbers as characters.}
+
+\item{group}{Data can be grouped either by by sowing number (sowing_number) or growth conditions
+(conditions). Only these options are possible. When data is grouped by conditions the sowing
+numbers column is a list in case multiple sowing numbers are included.}
 }
 \value{
-This function summarises a flowering time data frame producing a list of the
-summarised data and relevant raw data
+This function summarises a flowering time data frame producing a dataframe of the
+summarised data grouped either by sowing number or growth conditions. Means and 95% confidence
+intervals are calculated. A list column containing the raw data and mutant status if
+applicable is also included.
 }
 \description{
 flr.summary
 }
 \examples{
 data = Mid_2016
-LoI = c("P912", "P913") # Lines of interest
-d <- flr.summary(data, LoI)
+# Lines of interest
+LoI <- c("P880", "P881", "P883", "Q022", "Q023", "P935", "P938", "P936", "P939")
+flr.summary(flowering_data , LoI)
 }

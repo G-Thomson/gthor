@@ -1,8 +1,102 @@
 #' flr.summary
 #'
 #' @param data This is a dataframe of flowering time fata with the following columns; Sowing.Number,
-#' Conditions, Genotype, Plant.Number, Date.Sown, Date.Flowered, Number.of.Days.to.First.Floral.Bud,
-#' Position.of.1st.Floral.Bud, Node.Number.of.Main.Axis.at.1st.Floral.Bud and Comments.
+#'  Conditions, Genotype, Individual, Plant.Number, Date.Sown, Date.Flowered,
+#'  Number.of.Days.to.First.Floral.Bud, Position.of.1st.Floral.Bud,
+#'  Node.Number.of.Main.Axis.at.1st.Floral.Bud, Comments and Mutant.
+#'
+#' @param LoI These are the Lines of Interest to be examined. Enter these as a vector of sowing
+#'  numbers as characters.
+#' @param group Data can be grouped either by by sowing number (sowing_number) or growth conditions
+#' (conditions). Only these options are possible. When data is grouped by conditions the sowing
+#' numbers column is a list in case multiple sowing numbers are included.
+#'
+#' @return This function summarises a flowering time data frame producing a dataframe of the
+#' summarised data grouped either by sowing number or growth conditions. Means and 95% confidence
+#' intervals are calculated. A list column containing the raw data and mutant status if
+#' applicable is also included.
+#'
+#' @examples data = Mid_2016
+#' # Lines of interest
+#' LoI <- c("P880", "P881", "P883", "Q022", "Q023", "P935", "P938", "P936", "P939")
+#' flr.summary(flowering_data , LoI)
+#' @export
+flr.summary <- function(data, LoI, group = sowing_number){
+
+  require(dplyr)
+  require(magrittr)
+
+  # Make group a quosure
+  group <- enquo(group)
+
+  # This just checks that the grouping argument is valid
+  if(!quo_name(group) %in% c("sowing_number", "conditions")) stop("You can only group by sowing_number or conditions")
+
+  # Rename data
+  data <- rename(data,
+                 sowing_number = .data$Sowing_Number,
+                 conditions = .data$Conditions,
+                 genotype = .data$Genotype,
+                 individual = .data$Individual,
+                 plant_num = .data$Plant_Number,
+                 sowing_date = .data$Date_Sown,
+                 flowering_date = .data$Date_Flowered,
+                 days_to_flower = .data$Number_of_Days_to_First_Floral_Bud,
+                 first_bud_loc = .data$Position_of_1st_Floral_Bud,
+                 node_num = .data$Node_Number_of_Main_Axis_at_1st_Floral_Bud,
+                 mutant = .data$Mutant)
+
+  # Ensure there ar no NA entries
+  data <- filter(data,
+                 !is.na(flowering_date))
+
+  # Ensure flowering time data is numeric
+  data <- mutate(data,
+                 days_to_flower = as.numeric(days_to_flower),
+                 node_num = as.numeric(node_num))
+
+  # Relevent summary data
+  rel.sum <- filter(data, sowing_number %in% LoI) %>%
+    select(sowing_number, genotype, conditions, days_to_flower, node_num, mutant)
+
+  # When grouping by condition I would like to preserve the sowing number in the
+  # nested data so I can then extract it as a new column. This is not necessary
+  # when grouping by sowing number as each has a single condition
+  if(quo_name(group) == "sowing_number"){
+    rel.sum <- rel.sum %>%
+      group_by(!!group, conditions, genotype) %>%
+      nest(days_to_flower, node_num, mutant)
+  }
+  else if(quo_name(group) == "conditions"){
+    rel.sum <- rel.sum %>%
+      group_by(!!group, genotype) %>%
+      nest(sowing_number, days_to_flower, node_num, mutant) %>%
+      mutate(sowing_numbers = map(data, ~ unique(.x$sowing_number)))
+  }
+
+  # Here I calculate confidence intervals
+  rel.sum <- rel.sum %>%
+    mutate(days_to_flower_mean = map_dbl(data, ~ mean(.x$days_to_flower)),
+           node_num_mean = map_dbl(data, ~ mean(.x$node_num)),
+           days_to_flower_moe = map_dbl(data, ~ moe(.x$days_to_flower)),
+           node_num_moe = map_dbl(data, ~ moe(.x$node_num)),
+
+           days_to_flower_lower_ci = days_to_flower_mean - moe(days_to_flower_moe),
+           days_to_flower_upper_ci = days_to_flower_mean + moe(days_to_flower_moe),
+           node_num_lower_ci = node_num_mean - moe(node_num_moe),
+           node_num_upper_ci = node_num_mean + moe(node_num_moe)) %>%
+    select(-days_to_flower_moe, -node_num_moe)
+
+  return(rel.sum)
+}
+
+#' flr.summary.old
+#'
+#' @param data This is a dataframe of flowering time fata with the following columns; Sowing.Number,
+#'  Conditions, Genotype, Plant.Number, Date.Sown, Date.Flowered,
+#'  Number.of.Days.to.First.Floral.Bud, Position.of.1st.Floral.Bud,
+#'  Node.Number.of.Main.Axis.at.1st.Floral.Bud and Comments.
+#'
 #' @param LoI These are the Lines of Interest to be examined. Enter these as a vector of sowing
 #'  numbers as characters.
 #'
@@ -12,7 +106,7 @@
 #' LoI = c("P912", "P913") # Lines of interest
 #' d <- flr.summary(data, LoI)
 #' @export
-flr.summary <- function(data, LoI){
+flr.summary.old <- function(data, LoI){
 
   require(dplyr)
 

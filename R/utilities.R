@@ -8,24 +8,29 @@
 #' @examples pal(g_colours)
 #' @export
 pal <- function(col, border = "light gray", ...){
+
   n <- length(col)
+
   plot(0, 0, type="n", xlim = c(0, 1), ylim = c(0, 1),
        axes = FALSE, xlab = "", ylab = "", ...)
+
   rect(0:(n-1)/n, 0, 1:n/n, 1, col = col, border = border)
+
 }
 
 #' pickRandomRows
 #'
-#' @param df A dataframe
+#' @param data A dataframe
 #' @param numberOfRows Number of rows to sample
 #'
 #' This function randomly selects rows from a data frame. I got it from here/; http://www.markhneedham.com/blog/2014/11/26/r-dplyr-select-random-rows-from-a-data-frame/
 #' @export
-pickRandomRows = function(df, numberOfRows = 10) {
+pickRandomRows = function(data, numberOfRows = 10) {
 
   require(dplyr)
+  require(magrittr)
 
-  df %>% slice(runif(numberOfRows,0, length(df[,1])))
+  df %>% slice(runif(numberOfRows,0, length(data[,1])))
 }
 
 #' read.nano
@@ -50,5 +55,19 @@ read.nano <- function(Path){
 
   kable(dat, format = "markdown", row.names = FALSE,  padding = 2, align = 'c')
 }
+
+#' moe
+#'
+#' @param data A vector of numeric type
+#' @param alpha The significance level (default = 0.05)
+#'
+#' This calculates a margin of error (half a confidence interval) with the default being 95%.
+#'
+#' @export
+moe <- function(data, alpha = 0.05){
+  moe <- qt(1 - (alpha / 2), sum(!is.na(data)) - 1) * (sd(data, na.rm = TRUE)/sqrt(sum(!is.na(data))))
+  return(moe)
+}
+
 
 

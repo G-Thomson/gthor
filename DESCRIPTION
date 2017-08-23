@@ -11,8 +11,6 @@ URL: https://github.com/G-Thomson/gthor
 BugReports: https://github.com/G-Thomson/gthor/issues
 RoxygenNote: 6.0.1
 Imports:
-  tidyverse,
-  readr
+  tidyverse
 Depends:
-  tidyverse,
-  readr
+  tidyverse

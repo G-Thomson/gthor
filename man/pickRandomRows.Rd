@@ -4,10 +4,10 @@
 \alias{pickRandomRows}
 \title{pickRandomRows}
 \usage{
-pickRandomRows(df, numberOfRows = 10)
+pickRandomRows(data, numberOfRows = 10)
 }
 \arguments{
-\item{df}{A dataframe}
+\item{data}{A dataframe}
 
 \item{numberOfRows}{Number of rows to sample
 
