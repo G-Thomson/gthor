@@ -29,5 +29,6 @@ my_theme <- function(base_size = 12,
             plot.background = element_rect(fill = "transparent",colour = NA),
             plot.title = element_text(hjust = 0, face = "bold"),
             plot.margin = unit(c(1, 1, 1, 1), "lines"),
-            strip.background = element_rect(fill = "transparent", colour = NA)))
+            strip.background = element_rect(fill = "transparent", colour = NA),
+            strip.text = element_text(hjust=0, face = "bold", size = rel(2))))
 }
