@@ -6,7 +6,7 @@
 #' @export
 my_theme <- function(base_size = 12,
                      base_family = "sans") {
-  (theme_foundation(base_size = base_size, base_family = base_family) +
+  (ggthemes::theme_foundation(base_size = base_size, base_family = base_family) +
       theme(line = element_line(linetype = 1, colour = "black"),
             rect = element_rect(fill = "transparent", linetype = 0, colour = NA),
             text = element_text(colour = "black"),
