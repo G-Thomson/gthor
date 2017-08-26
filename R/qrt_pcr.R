@@ -345,7 +345,7 @@ eds.test <- function(data, Reference_gene, Measured_genes, Experimental_conditio
 
   # Analyse one gene at a time
   for(g in 1:length(Measured_genes)){
-    
+
     # This is where all the gene's data will go
     gene.data <- data.frame()
 
@@ -366,7 +366,7 @@ eds.test <- function(data, Reference_gene, Measured_genes, Experimental_conditio
       rel.data <- grep(Measured_genes[g], data.names, value=TRUE)
       gene.data <- bind_rows(gene.data, inner_join(data[[rel.ref]], data[[rel.data]], by = "Sample"))
     }
-    
+
 #     return(Measured_genes[g])}
 # }
 # eds.test(data_res_New_FTa1, "MtPDF2", "New_FTa1", Replicate_id = "_B")
@@ -401,4 +401,68 @@ eds.test <- function(data, Reference_gene, Measured_genes, Experimental_conditio
   # Return the list
   return(res)
 }
+
+#' rt.summary
+#'
+#' @export
+rt.summary <- function(data, Experimental_conditions  = NULL){
+
+  require(dplyr)
+
+  data <- data %>%
+    select(sample, bio_replicate, target, Ct) %>%
+    group_by(target, sample, bio_replicate) %>%
+    summarise(mean_ct = mean(Ct)) %>%
+    return()
+}
+
+test <- rt.summary(expression_data)
+
+#' rt.test
+#'
+#' @export
+rt.test <- function(data, reference = MtPDF2){
+
+  require(dplyr)
+  require(tidyr)
+
+  # Make reference a quosure
+  reference <- enquo(reference)
+
+  # Check data format
+  if(sum(colnames(data) == c("target",
+                             "sample",
+                             "bio_replicate",
+                             "mean_ct")) != 4){
+
+    stop("ERROR: Input must be a data frame from rt.summary().")}
+
+  # Check the reference gene is there
+  if(!quo_name(reference) %in% (data %>% pull(target))){
+
+    stop("ERROR: Your reference gene isn't in the dataset.")
+  }
+
+  data %>%
+    ungroup() %>%
+    spread(target, mean_ct) %>%
+    mutate(sample = as.character(sample)) %>% # for future sanity
+    mutate_at(vars(-one_of(c("sample", "bio_replicate", quo_name(reference)))),
+              funs(dCt = . - !! reference)) %>%
+    mutate_at(vars(contains("dCt")),
+              funs(ddCt = . - min(.))) %>%
+    mutate_at(vars(contains("ddCt")),
+              funs(comp_exp = 2 ^ - .)) %>%
+    nest(-sample) %>%
+    mutate(mean = map(data, ~ summarise_at(.x, vars(contains("comp_exp")),
+                                           funs(mean_expr = mean(.)))),
+           se = map(data, ~ summarise_at(.x, vars(contains("comp_exp")),
+                                         funs(se_expr = sd(.)/sqrt(length(.))    ))) ) %>%
+    unnest(mean, se)
+
+
+}
+
+
+
 
