@@ -416,8 +416,6 @@ rt.summary <- function(data, Experimental_conditions  = NULL){
     return()
 }
 
-test <- rt.summary(expression_data)
-
 #' rt.test
 #'
 #' @export
