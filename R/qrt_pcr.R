@@ -409,9 +409,9 @@ rt.summary <- function(data, Experimental_conditions  = NULL){
 
   require(dplyr)
 
-  data <- data %>%
-    select(sample, condition, bio_replicate, target, Ct) %>%
-    group_by(target, sample, condition, bio_replicate) %>%
+  data %>%
+    select(sample, genotype, condition, bio_replicate, target, Ct) %>%
+    group_by(target, sample, genotype, condition, bio_replicate) %>%
     summarise(mean_ct = mean(Ct))
 }
 
@@ -429,9 +429,10 @@ rt.test <- function(data, reference = MtPDF2){
   # Check data format
   if(sum(colnames(data) == c("target",
                              "sample",
+                             "genotype",
                              "condition",
                              "bio_replicate",
-                             "mean_ct")) != 5){
+                             "mean_ct")) != 6){
 
     stop("ERROR: Input must be a data frame from rt.summary().")}
 
@@ -446,13 +447,13 @@ rt.test <- function(data, reference = MtPDF2){
     ungroup() %>%
     spread(target, mean_ct) %>%
     mutate(sample = as.character(sample)) %>% # for future sanity
-    mutate_at(vars(-one_of(c("sample", "condition", "bio_replicate", quo_name(reference)))),
+    mutate_at(vars(-one_of(c("sample", "genotype", "condition", "bio_replicate", quo_name(reference)))),
               funs(dCt = . - !! reference)) %>%
     mutate_at(vars(contains("dCt")),
               funs(ddCt = . - min(.))) %>%
     mutate_at(vars(contains("ddCt")),
               funs(comp_exp = 2 ^ - .)) %>%
-    nest(-sample, -condition) %>%
+    nest(-sample, -genotype, -condition) %>%
     mutate(mean = map(data, ~ summarise_at(.x, vars(contains("comp_exp")),
                                            funs(mean_expr = mean(.) ))),
            se = map(data, ~ summarise_at(.x, vars(contains("comp_exp")),
@@ -463,6 +464,6 @@ rt.test <- function(data, reference = MtPDF2){
            mean = map(mean, ~ set_colnames(.x, str_replace(names(.), "_dCt_ddCt_comp_exp_", "_"))),
            se = map(se, ~ set_colnames(.x, str_replace(names(.), "_dCt_ddCt_comp_exp_", "_"))) ) %>%
     unnest(mean, se) %>%
-    select(1:3, order(colnames(.)))
+    select(1:4, order(colnames(.)))
 
 }
