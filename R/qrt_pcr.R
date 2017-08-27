@@ -410,10 +410,9 @@ rt.summary <- function(data, Experimental_conditions  = NULL){
   require(dplyr)
 
   data <- data %>%
-    select(sample, bio_replicate, target, Ct) %>%
-    group_by(target, sample, bio_replicate) %>%
-    summarise(mean_ct = mean(Ct)) %>%
-    return()
+    select(sample, condition, bio_replicate, target, Ct) %>%
+    group_by(target, sample, condition, bio_replicate) %>%
+    summarise(mean_ct = mean(Ct))
 }
 
 #' rt.test
@@ -430,8 +429,9 @@ rt.test <- function(data, reference = MtPDF2){
   # Check data format
   if(sum(colnames(data) == c("target",
                              "sample",
+                             "condition",
                              "bio_replicate",
-                             "mean_ct")) != 4){
+                             "mean_ct")) != 5){
 
     stop("ERROR: Input must be a data frame from rt.summary().")}
 
@@ -441,26 +441,28 @@ rt.test <- function(data, reference = MtPDF2){
     stop("ERROR: Your reference gene isn't in the dataset.")
   }
 
+  # Perform the ddCt method
   data %>%
     ungroup() %>%
     spread(target, mean_ct) %>%
     mutate(sample = as.character(sample)) %>% # for future sanity
-    mutate_at(vars(-one_of(c("sample", "bio_replicate", quo_name(reference)))),
+    mutate_at(vars(-one_of(c("sample", "condition", "bio_replicate", quo_name(reference)))),
               funs(dCt = . - !! reference)) %>%
     mutate_at(vars(contains("dCt")),
               funs(ddCt = . - min(.))) %>%
     mutate_at(vars(contains("ddCt")),
               funs(comp_exp = 2 ^ - .)) %>%
-    nest(-sample) %>%
+    nest(-sample, -condition) %>%
     mutate(mean = map(data, ~ summarise_at(.x, vars(contains("comp_exp")),
-                                           funs(mean_expr = mean(.)))),
+                                           funs(mean_expr = mean(.) ))),
            se = map(data, ~ summarise_at(.x, vars(contains("comp_exp")),
-                                         funs(se_expr = sd(.)/sqrt(length(.))    ))) ) %>%
-    unnest(mean, se)
-
+                                         funs(se = sd(.)/sqrt(length(.)) ))),
+           # Shorten names
+           data = map(data, ~ set_colnames(.x, str_replace(names(.), "_dCt_", "_"))),
+           data = map(data, ~ set_colnames(.x, str_replace(names(.), "_ddCt_", "_"))),
+           mean = map(mean, ~ set_colnames(.x, str_replace(names(.), "_dCt_ddCt_comp_exp_", "_"))),
+           se = map(se, ~ set_colnames(.x, str_replace(names(.), "_dCt_ddCt_comp_exp_", "_"))) ) %>%
+    unnest(mean, se) %>%
+    select(1:3, order(colnames(.)))
 
 }
-
-
-
-
