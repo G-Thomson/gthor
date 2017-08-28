@@ -87,10 +87,10 @@ flr.summary <- function(data, LoI, group = sowing_number){
            days_to_flower_moe = map_dbl(data, ~ moe(.x$days_to_flower)),
            node_num_moe = map_dbl(data, ~ moe(.x$node_num)),
 
-           days_to_flower_lower_ci = days_to_flower_mean - moe(days_to_flower_moe),
-           days_to_flower_upper_ci = days_to_flower_mean + moe(days_to_flower_moe),
-           node_num_lower_ci = node_num_mean - moe(node_num_moe),
-           node_num_upper_ci = node_num_mean + moe(node_num_moe)) %>%
+           days_to_flower_lower_ci = days_to_flower_mean - days_to_flower_moe,
+           days_to_flower_upper_ci = days_to_flower_mean + days_to_flower_moe,
+           node_num_lower_ci = node_num_mean - node_num_moe,
+           node_num_upper_ci = node_num_mean + node_num_moe) %>%
     select(-days_to_flower_moe, -node_num_moe)
 
   return(rel.sum)
