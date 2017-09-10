@@ -46,7 +46,7 @@ flr.summary <- function(data, LoI, group = sowing_number){
                  node_num = .data$Node_Number_of_Main_Axis_at_1st_Floral_Bud,
                  mutant = .data$Mutant)
 
-  # Ensure there ar no NA entries
+  # Ensure there are no NA entries
   data <- filter(data,
                  !is.na(flowering_date))
 
@@ -82,8 +82,8 @@ flr.summary <- function(data, LoI, group = sowing_number){
 
   # Here I calculate confidence intervals
   rel.sum <- rel.sum %>%
-    mutate(days_to_flower_mean = map_dbl(data, ~ mean(.x$days_to_flower)),
-           node_num_mean = map_dbl(data, ~ mean(.x$node_num)),
+    mutate(days_to_flower_mean = map_dbl(data, ~ mean(.x$days_to_flower, na.rm = T)),
+           node_num_mean = map_dbl(data, ~ mean(.x$node_num, , na.rm = T)),
            days_to_flower_moe = map_dbl(data, ~ moe(.x$days_to_flower)),
            node_num_moe = map_dbl(data, ~ moe(.x$node_num)),
 
