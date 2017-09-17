@@ -12,6 +12,8 @@ BugReports: https://github.com/G-Thomson/gthor/issues
 RoxygenNote: 6.0.1
 Imports:
   tidyverse,
-  ggthemes
+  ggthemes,
+  broom
 Depends:
-  tidyverse
+  tidyverse,
+  broom

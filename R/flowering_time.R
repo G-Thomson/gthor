@@ -1,3 +1,83 @@
+flr.test <- function(data, LoI, group = conditions){
+
+  require(dplyr)
+  require(magrittr)
+
+  # Make group a quosure
+  group <- enquo(group)
+
+  # This just checks that the grouping argument is valid
+  if(!quo_name(group) %in% c("sowing_number", "conditions", "mutant")) stop("You can only group by sowing_number or conditions")
+
+  # Rename data
+  data <- rename(data,
+                 sowing_number = .data$Sowing_Number,
+                 conditions = .data$Conditions,
+                 genotype = .data$Genotype,
+                 individual = .data$Individual,
+                 plant_num = .data$Plant_Number,
+                 sowing_date = .data$Date_Sown,
+                 flowering_date = .data$Date_Flowered,
+                 days_to_flower = .data$Number_of_Days_to_First_Floral_Bud,
+                 first_bud_loc = .data$Position_of_1st_Floral_Bud,
+                 node_num = .data$Node_Number_of_Main_Axis_at_1st_Floral_Bud,
+                 mutant = .data$Mutant)
+
+  # Ensure there are no NA entries
+  data <- filter(data,
+                 !is.na(flowering_date))
+
+  # Ensure flowering time data is numeric
+  data <- mutate(data,
+                 days_to_flower = as.numeric(days_to_flower),
+                 node_num = as.numeric(node_num))
+
+  # Relevent summary data
+  rel.sum <- filter(data, sowing_number %in% LoI) %>%
+    select(sowing_number, genotype, conditions, plant_num, days_to_flower, node_num, mutant)
+
+  # When grouping by condition I would like to preserve the sowing number in the
+  # nested data so I can then extract it as a new column. This is not necessary
+  # when grouping by sowing number as each has a single condition
+  if(quo_name(group) == "conditions"){
+    rel.sum <- rel.sum %>%
+      select(-mutant) %>%
+      group_by(!!group) %>%
+      gather(measurment, value, -sowing_number, -conditions, -plant_num, -genotype) %>%
+      unite(geno_meas, genotype, measurment) %>%
+      group_by(geno_meas) %>%
+      # mutate(id = row_number()) %>% #############
+      # select(-sowing_number) %>%
+      spread(geno_meas, value)
+      # select(-id)
+      # nest(sowing_number, genotype, days_to_flower, node_num) %>%
+      # mutate(sowing_numbers = map(data, ~ unique(.x$sowing_number)),
+      #        data = map(data, ~ .x %>%
+      #                     select(-sowing_number) %>%
+      #                     gather(measurment, value, -genotype) %>%
+      #                     unite(geno_meas, genotype, measurment) %>%
+      #                     group_by(geno_meas) %>%
+      #                     mutate(id = row_number()) %>% #############
+      #                     spread(geno_meas, value) %>%
+      #                     select(-id)
+                          # ))
+
+  }
+  else if(quo_name(group) == "mutant"){
+    rel.sum <- rel.sum %>%
+      group_by(!!group, conditions) %>%
+      nest(sowing_number, genotype, days_to_flower, node_num) %>%
+      mutate(sowing_numbers = map(data, ~ unique(.x$sowing_number)))
+  }
+
+  # Here I conduct t.tests between genotypes
+  # rel.sum <- rel.sum %>%
+  #   mutate(test = map(data, ~ mean(.x$days_to_flower, na.rm = T))
+
+  return(rel.sum)
+}
+
+
 #' flr.summary
 #'
 #' @param data This is a dataframe of flowering time fata with the following columns; Sowing.Number,
@@ -83,7 +163,7 @@ flr.summary <- function(data, LoI, group = sowing_number){
   # Here I calculate confidence intervals
   rel.sum <- rel.sum %>%
     mutate(days_to_flower_mean = map_dbl(data, ~ mean(.x$days_to_flower, na.rm = T)),
-           node_num_mean = map_dbl(data, ~ mean(.x$node_num, , na.rm = T)),
+           node_num_mean = map_dbl(data, ~ mean(.x$node_num, na.rm = T)),
            days_to_flower_moe = map_dbl(data, ~ moe(.x$days_to_flower)),
            node_num_moe = map_dbl(data, ~ moe(.x$node_num)),
 
