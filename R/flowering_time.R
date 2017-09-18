@@ -2,6 +2,7 @@ flr.test <- function(data, LoI, group = conditions){
 
   require(dplyr)
   require(magrittr)
+  require(broom)
 
   # Make group a quosure
   group <- enquo(group)
@@ -43,24 +44,17 @@ flr.test <- function(data, LoI, group = conditions){
     rel.sum <- rel.sum %>%
       select(-mutant) %>%
       group_by(!!group) %>%
-      gather(measurment, value, -sowing_number, -conditions, -plant_num, -genotype) %>%
-      unite(geno_meas, genotype, measurment) %>%
-      group_by(geno_meas) %>%
-      # mutate(id = row_number()) %>% #############
-      # select(-sowing_number) %>%
-      spread(geno_meas, value)
-      # select(-id)
-      # nest(sowing_number, genotype, days_to_flower, node_num) %>%
-      # mutate(sowing_numbers = map(data, ~ unique(.x$sowing_number)),
-      #        data = map(data, ~ .x %>%
-      #                     select(-sowing_number) %>%
-      #                     gather(measurment, value, -genotype) %>%
-      #                     unite(geno_meas, genotype, measurment) %>%
-      #                     group_by(geno_meas) %>%
-      #                     mutate(id = row_number()) %>% #############
-      #                     spread(geno_meas, value) %>%
-      #                     select(-id)
-                          # ))
+      nest(sowing_number, plant_num, genotype, days_to_flower, node_num)  %>%
+      mutate(sowing_numbers = map(data, ~ unique(.x$sowing_number)),
+             data = map(data, ~ select(.x, -sowing_number)),
+
+             data = map(data, ~ gather(.x, measurment, value, -genotype, -plant_num)),
+             data = map(data, ~ unite(.x, geno_meas, genotype, measurment)),
+             data = map(data, ~ group_by(.x, geno_meas)),
+             data = map(data, ~ mutate(.x, counter = rank(as.numeric(plant_num), ties.method= "first"))),
+             data = map(data, ~ select(.x, -plant_num)),
+             data = map(data, ~ spread(.x, geno_meas, value))
+      )
 
   }
   else if(quo_name(group) == "mutant"){
@@ -70,9 +64,26 @@ flr.test <- function(data, LoI, group = conditions){
       mutate(sowing_numbers = map(data, ~ unique(.x$sowing_number)))
   }
 
+  # Data checks
+  day_check <- rel.sum$data %>%
+    map_lgl(~ ncol(select(.x, contains("days_to_flower"))) == 2)
+  node_check <- rel.sum$data %>%
+    map_lgl(~ ncol(select(.x, contains("node_num"))) == 2)
+
+  if(length(day_check) != sum(day_check) | length(node_check) != sum(node_check)) stop("Check your data. There needs to be TWO sets of observations for each test")
+
   # Here I conduct t.tests between genotypes
-  # rel.sum <- rel.sum %>%
-  #   mutate(test = map(data, ~ mean(.x$days_to_flower, na.rm = T))
+  rel.sum <- rel.sum %>%
+    mutate(test_days = map(data, ~ tidy(t.test(pull(.x[,2]), pull(.x[,4])))),
+           test_days = map(test_days, ~ select(.x, estimate, statistic, p.value, conf.low, conf.high)),
+
+           test_nodes = map(data, ~ tidy(t.test(pull(.x[,3]), pull(.x[,4])))),
+           test_nodes = map(test_nodes, ~ select(.x, estimate, statistic, p.value, conf.low, conf.high)),
+
+           days_p.value = map_dbl(test_days, ~.x$p.value),
+           days_sig_diff = days_p.value < 0.05,
+           nodes_p.value = map_dbl(test_nodes, ~.x$p.value),
+           nodes_dig_diff = nodes_p.value < 0.05)
 
   return(rel.sum)
 }

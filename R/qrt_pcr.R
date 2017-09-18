@@ -422,6 +422,8 @@ rt.test <- function(data, reference = MtPDF2){
 
   require(dplyr)
   require(tidyr)
+  require(stringr)
+  require(purrr)
 
   # Make reference a quosure
   reference <- enquo(reference)
@@ -442,6 +444,7 @@ rt.test <- function(data, reference = MtPDF2){
     stop("ERROR: Your reference gene isn't in the dataset.")
   }
 
+  my_true = TRUE
   # Perform the ddCt method
   data %>%
     ungroup() %>%
@@ -450,20 +453,24 @@ rt.test <- function(data, reference = MtPDF2){
     mutate_at(vars(-one_of(c("sample", "genotype", "condition", "bio_replicate", quo_name(reference)))),
               funs(dCt = . - !! reference)) %>%
     mutate_at(vars(contains("dCt")),
-              funs(ddCt = . - min(.))) %>%
+              funs(ddCt = . - min(.,  na.rm = TRUE))) %>%
     mutate_at(vars(contains("ddCt")),
               funs(comp_exp = 2 ^ - .)) %>%
     nest(-sample, -genotype, -condition) %>%
+
+
+
     mutate(mean = map(data, ~ summarise_at(.x, vars(contains("comp_exp")),
-                                           funs(mean_expr = mean(.) ))),
-           se = map(data, ~ summarise_at(.x, vars(contains("comp_exp")),
-                                         funs(se = sd(.)/sqrt(length(.)) ))),
+                                           funs(mean_expr = mean(., na.rm = T) ))), # T NOT TRUE for some reason
+           se   = map(data, ~ summarise_at(.x, vars(contains("comp_exp")),
+                                           funs(se = sd(., na.rm = T)/sqrt(sum(!is.na(.))) ))), # T NOT TRUE for some reason
+
            # Shorten names
            data = map(data, ~ set_colnames(.x, str_replace(names(.), "_dCt_", "_"))),
            data = map(data, ~ set_colnames(.x, str_replace(names(.), "_ddCt_", "_"))),
            mean = map(mean, ~ set_colnames(.x, str_replace(names(.), "_dCt_ddCt_comp_exp_", "_"))),
-           se = map(se, ~ set_colnames(.x, str_replace(names(.), "_dCt_ddCt_comp_exp_", "_"))) ) %>%
+           se = map(se, ~ set_colnames(.x, str_replace(names(.), "_dCt_ddCt_comp_exp_", "_")))
+    ) %>%
     unnest(mean, se) %>%
     select(1:4, order(colnames(.)))
-
 }
