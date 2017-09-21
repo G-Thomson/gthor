@@ -405,14 +405,15 @@ eds.test <- function(data, Reference_gene, Measured_genes, Experimental_conditio
 #' rt.summary
 #'
 #' @export
-rt.summary <- function(data, Experimental_conditions  = NULL){
+rt.summary <- function(data){
 
   require(dplyr)
 
   data %>%
-    select(sample, genotype, condition, bio_replicate, target, Ct) %>%
-    group_by(target, sample, genotype, condition, bio_replicate) %>%
-    summarise(mean_ct = mean(Ct))
+    select(date, sample, genotype, condition, bio_replicate, target, Ct) %>%
+    group_by(date, target, sample, genotype, condition, bio_replicate) %>%
+    summarise(mean_ct = mean(Ct), sd_div_mean = sd(Ct)/mean(Ct)) %>%
+    mutate(sd_check = sd_div_mean < 0.015)
 }
 
 #' rt.test
@@ -429,12 +430,15 @@ rt.test <- function(data, reference = MtPDF2){
   reference <- enquo(reference)
 
   # Check data format
-  if(sum(colnames(data) == c("target",
+  if(sum(colnames(data) == c("date",
+                             "target",
                              "sample",
                              "genotype",
                              "condition",
                              "bio_replicate",
-                             "mean_ct")) != 6){
+                             "mean_ct",
+                             "sd_div_mean",
+                             "sd_check")) != 9){
 
     stop("ERROR: Input must be a data frame from rt.summary().")}
 
@@ -444,14 +448,14 @@ rt.test <- function(data, reference = MtPDF2){
     stop("ERROR: Your reference gene isn't in the dataset.")
   }
 
-  my_true = TRUE
   # Perform the ddCt method
   data %>%
     ungroup() %>%
+    select(-sd_div_mean, -sd_check) %>%
     spread(target, mean_ct) %>%
     mutate(sample = as.character(sample)) %>% # for future sanity
-    mutate_at(vars(-one_of(c("sample", "genotype", "condition", "bio_replicate", quo_name(reference)))),
-              funs(dCt = . - !! reference)) %>%
+    mutate_at(vars(-one_of(c("date","sample", "genotype", "condition", "bio_replicate", "MtPDF2"))),
+              funs(dCt = . - MtPDF2)) %>%
     mutate_at(vars(contains("dCt")),
               funs(ddCt = . - min(.,  na.rm = TRUE))) %>%
     mutate_at(vars(contains("ddCt")),
