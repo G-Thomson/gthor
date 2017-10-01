@@ -80,7 +80,7 @@ flr.test <- function(data, LoI, group = conditions){
     mutate(test_days = map(data, ~ tidy(t.test(pull(.x[,2]), pull(.x[,4])))),
            test_days = map(test_days, ~ select(.x, estimate, statistic, p.value, conf.low, conf.high)),
 
-           test_nodes = map(data, ~ tidy(t.test(pull(.x[,3]), pull(.x[,4])))),
+           test_nodes = map(data, ~ tidy(t.test(pull(.x[,3]), pull(.x[,5])))),
            test_nodes = map(test_nodes, ~ select(.x, estimate, statistic, p.value, conf.low, conf.high)),
 
            days_p.value = map_dbl(test_days, ~.x$p.value),
