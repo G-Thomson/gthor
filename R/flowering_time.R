@@ -1,3 +1,6 @@
+#' flr.summary
+#'
+#' @export
 flr.test <- function(data, LoI, group = conditions){
 
   require(dplyr)
