@@ -20,6 +20,8 @@ my_theme <- function(base_size = 12,
             axis.ticks = element_line(colour = NULL),
             axis.ticks.x = element_line(colour = NULL),
             axis.line = element_line(),
+            legend.position = "bottom",
+            legend.title = element_blank(),
             panel.background = element_rect(fill = "transparent",colour = NA),
             panel.grid = element_line(colour = NULL, linetype = 3),
             panel.grid.major = element_line(colour = "black"),
@@ -29,5 +31,5 @@ my_theme <- function(base_size = 12,
             plot.title = element_text(hjust = 0, face = "bold"),
             plot.margin = unit(c(1, 1, 1, 1), "lines"),
             strip.background = element_rect(fill = "transparent", colour = NA),
-            strip.text = element_text(hjust=0, face = "bold", size = rel(2))))
+            strip.text = element_text(face = "bold", size = rel(2))))
 }
