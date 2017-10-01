@@ -1,9 +1,10 @@
 #' flr.summary
 #'
 #' @export
-flr.test <- function(data, LoI, group = conditions){
+flr.test <- function(data, LoI, group = conditions, WT = "R108"){
 
   require(dplyr)
+  require(forcats)
   require(magrittr)
   require(broom)
 
@@ -87,6 +88,13 @@ flr.test <- function(data, LoI, group = conditions){
            days_sig_diff = days_p.value < 0.05,
            nodes_p.value = map_dbl(test_nodes, ~.x$p.value),
            nodes_dig_diff = nodes_p.value < 0.05)
+
+  # This needs to be generalised
+  if(WT == "R108"){
+    rel.sum <- rel.sum %>%
+      mutate(genotype = factor(genotype) %>%
+               fct_relevel(genotype, "R108"))
+  }
 
   return(rel.sum)
 }

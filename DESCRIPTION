@@ -16,4 +16,5 @@ Imports:
   broom
 Depends:
   tidyverse,
-  broom
+  broom,
+  forcats
