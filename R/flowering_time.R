@@ -1,10 +1,9 @@
 #' flr.summary
 #'
 #' @export
-flr.test <- function(data, LoI, group = conditions, WT = "R108"){
+flr.test <- function(data, LoI, group = conditions){
 
   require(dplyr)
-  require(forcats)
   require(magrittr)
   require(broom)
 
@@ -89,13 +88,6 @@ flr.test <- function(data, LoI, group = conditions, WT = "R108"){
            nodes_p.value = map_dbl(test_nodes, ~.x$p.value),
            nodes_dig_diff = nodes_p.value < 0.05)
 
-  # This needs to be generalised
-  if(WT == "R108"){
-    rel.sum <- rel.sum %>%
-      mutate(genotype = factor(genotype) %>%
-               fct_relevel(genotype, "R108"))
-  }
-
   return(rel.sum)
 }
 
@@ -123,9 +115,10 @@ flr.test <- function(data, LoI, group = conditions, WT = "R108"){
 #' LoI <- c("P880", "P881", "P883", "Q022", "Q023", "P935", "P938", "P936", "P939")
 #' flr.summary(flowering_data , LoI)
 #' @export
-flr.summary <- function(data, LoI, group = sowing_number){
+flr.summary <- function(data, LoI, group = sowing_number, WT = "R108"){
 
   require(dplyr)
+  require(forcats)
   require(magrittr)
 
   # Make group a quosure
@@ -194,6 +187,13 @@ flr.summary <- function(data, LoI, group = sowing_number){
            node_num_lower_ci = node_num_mean - node_num_moe,
            node_num_upper_ci = node_num_mean + node_num_moe) %>%
     select(-days_to_flower_moe, -node_num_moe)
+
+  # This needs to be generalised
+  if(WT == "R108"){
+    rel.sum <- rel.sum %>%
+      mutate(genotype = factor(genotype) %>%
+               fct_relevel(genotype, "R108"))
+  }
 
   return(rel.sum)
 }
