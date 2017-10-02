@@ -69,5 +69,12 @@ moe <- function(data, alpha = 0.05){
   return(moe)
 }
 
+#' px_to_mm
+#'
+#' @export
+px_to_mm <- function(n){
+  n*0.264583
+}
+
 
 
