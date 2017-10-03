@@ -77,4 +77,117 @@ px_to_mm <- function(n){
 }
 
 
+ggarrange <- function(..., plotlist = NULL, ncol = NULL, nrow = NULL,
+                      labels = NULL,
+                      align = c("none", "h", "v", "hv"),
+                      widths = 1, heights = 1,
+                      legend = NULL, common.legend = FALSE,
+                      label_size = 14, label_fontfamily = NULL,
+                      label_fontface = "bold", label_colour = NULL,
+                      label_x = 0, label_y = 1,
+                      hjust = -0.5, vjust = 1.5)
+{
+  align <- match.arg(align)
+  plots <- c(list(...), plotlist)
+  nb.plots <- length(plots)
+  nb.plots.per.page <- .nbplots_per_page(ncol, nrow)
+
+  if(is.null(legend) & common.legend)
+    legend <- "top"
+  legend <- .check_legend(legend)
+  if(!is.null(legend))
+    plots <- purrr::map(plots, function(x) x + theme(legend.position = legend))
+
+  # Split plots over multiple pages
+  if(nb.plots > nb.plots.per.page){
+    plots <- split(plots, ceiling(seq_along(plots)/nb.plots.per.page))
+  }
+
+  # One unique page
+  else plots <- list(plots)
+
+  res <- purrr::map(plots, .plot_grid,
+                    ncol = ncol, nrow = nrow, labels = labels, align = align,
+                    rel_widths = widths, rel_heights = heights,
+                    legend = legend, common.legend = common.legend,
+                    label_size = label_size, label_fontfamily = label_fontfamily,
+                    label_fontface = label_fontface, label_colour = label_colour,
+                    label_x = label_x, label_y = label_y,
+                    hjust = hjust, vjust = vjust)
+
+  if(length(res) == 1) res <- res[[1]]
+
+  class(res) <- c(class(res), "ggarrange")
+  res
+}
+
+
+
+
+# Compute number of plots per page
+.nbplots_per_page <- function(ncol = NULL, nrow = NULL){
+
+  if(!is.null(ncol) & !is.null(nrow))
+    ncol * nrow
+  else if(!is.null(ncol))
+    ncol
+  else if(!is.null(nrow))
+    nrow
+  else Inf
+}
+
+
+.plot_grid <- function(plotlist, legend = "top", common.legend = FALSE,  ... ){
+
+
+  if(common.legend){
+    # Legend infos
+    leg <- get_legend(plotlist[[1]])
+    lheight <- sum(leg$height)
+    lwidth <- sum(leg$width)
+    plotlist <- purrr::map(plotlist, function(x) x + theme(legend.position = "none"))
+  }
+
+  res <- cowplot::plot_grid(plotlist = plotlist, ...)
+  if(!common.legend) return(res)
+
+  arrangeGrob <- gridExtra::arrangeGrob
+  unit.c <- grid::unit.c
+  .unit <- grid::unit(1, "npc")
+
+  res <- switch(legend,
+                top = arrangeGrob(leg, res, ncol = 1,
+                                  heights = unit.c(lheight, .unit - lheight)),
+                bottom = arrangeGrob(res, leg, ncol = 1,
+                                     heights = unit.c(unit(1, "npc") - lheight, lheight)),
+                left = arrangeGrob(leg, res, ncol = 2,
+                                   widths = unit.c(lwidth, .unit - lwidth)),
+                right = arrangeGrob(res, leg, ncol = 2,
+                                    widths = unit.c(.unit - lwidth, lwidth))
+  )
+
+  p <- cowplot::ggdraw() + cowplot::draw_grob(grid::grobTree(res))
+  p
+
+}
+
+.check_legend <- function(legend){
+
+  allowed.values <- c("top", "bottom", "left", "right", "none")
+
+  if(is.null(legend) | is.numeric(legend))
+    return(legend)
+  else if(is.logical(legend)){
+    if(legend) legend <- "top"
+    else legend <- "none"
+  }
+  else if(is.character(legend)){
+    legend <- legend[1]
+    if(!legend %in% allowed.values)
+      stop("Argument legend should be one of ", .collapse(allowed.values, sep = ", "))
+  }
+  return (legend)
+}
+
+
 
