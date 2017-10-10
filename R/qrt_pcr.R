@@ -460,7 +460,7 @@ rt.test <- function(data, reference = MtPDF2){
               funs(ddCt = . - min(.,  na.rm = TRUE))) %>%
     mutate_at(vars(contains("ddCt")),
               funs(comp_exp = 2 ^ - .)) %>%
-    filter(!is.na(ddCt)) %>%
+    filter(!is.na(ddCt)) %>% # problem with multiple genes at once.
     nest(-sample, -genotype, -condition) %>%
 
 
