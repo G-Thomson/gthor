@@ -10,7 +10,7 @@ ggplotRegression(fit)
 \item{fit}{is a linear model from the lm function}
 }
 \value{
-This plots a linear model with ggplot2. It is a function written by Susan 
+This plots a linear model with ggplot2. It is a function written by Susan
 Johnston (https://susanejohnston.wordpress.com/2012/08/09/a-quick-and-easy-function-to-plot-lm-results-in-r/).
 }
 \description{

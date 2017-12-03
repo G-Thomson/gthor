@@ -4,7 +4,7 @@
 \alias{ggtimeline}
 \title{ggtimeline}
 \usage{
-ggtimeline(x, begin, end)
+ggtimeline(x, begin, end, group = F)
 }
 \arguments{
 \item{x}{is a data.frame with three columns}
@@ -12,12 +12,14 @@ ggtimeline(x, begin, end)
 \item{begin}{is the date the timeline begins in the form "dd/mm/yyyy"}
 
 \item{end}{is the date the timeline ends in the form "dd/mm/yyyy"}
+
+\item{group}{Boolean denoting whether activities should be grouped in terms of colour}
 }
 \value{
-This function draws a timeline given a data.frame with three columns. 
-These columns should correspond to activity, start and end. The start and end columns 
-should be dates in the form of "dd/mm/yyyy". You also need to specific when 
-you want the time table to begin and end.
+This function draws a timeline given a data.frame with three or four columns.
+These columns should correspond to activity, start and end. The start and end columns
+should be dates in the form of "dd/mm/yyyy". You also need to specific when
+you want the time table to begin and end. Only have a "group" column if you have group = TRUE.
 }
 \description{
 ggtimeline

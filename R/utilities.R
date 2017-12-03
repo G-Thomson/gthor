@@ -78,6 +78,8 @@ px_to_mm <- function(n){
 
 #' list_to_df
 #'
+#' https://gist.github.com/aammd/9ae2f5cce9afd799bafb
+#'
 #' @export
 list_to_df <- function(listfordf){
   if(!is.list(listfordf)) stop("it should be a list")

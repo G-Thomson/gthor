@@ -4,7 +4,7 @@
 \alias{flr.summary}
 \title{flr.summary}
 \usage{
-flr.summary(data, LoI, group = sowing_number)
+flr.summary(data, LoI, group = sowing_number, WT = "R108")
 }
 \arguments{
 \item{data}{This is a dataframe of flowering time fata with the following columns; Sowing.Number,

@@ -4,7 +4,7 @@
 \alias{rt.summary}
 \title{rt.summary}
 \usage{
-rt.summary(data, Experimental_conditions = NULL)
+rt.summary(data)
 }
 \description{
 rt.summary
