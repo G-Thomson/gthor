@@ -26,10 +26,6 @@ ggtimeline <- function(x, begin, end, group = F){
   require(scales)
   require(ggplot2)
 
-
-
-  print(x)
-
   x$start = as.Date(x$start, "%d/%m/%Y")
   x$halt = as.Date(x$halt, "%d/%m/%Y")
 
