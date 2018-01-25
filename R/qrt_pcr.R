@@ -232,7 +232,7 @@ read.eds <- function(Path, in_file = "Results"){
     df <- select(df, Well, Sample, Target, Ct)
   }
   else if(in_file == "Melt"){
-    df <- select(df, Well, Sample, Target, Temperature, Derivative)
+    df <- select(df, Well, Target, Temperature, Derivative)
   }
 
   # Make Cts numeric - there will be a warning about "Undefined" being coerced to
